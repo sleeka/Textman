@@ -1,0 +1,76 @@
+version: '2'
+services:
+  redis:
+    build: ./redis
+    ports:
+     - "6379:6379"
+
+  nginx:
+    restart: always
+    build: ./nginx
+    links:
+     - api_1
+     - api_2
+     - api_3
+     - api_4
+    expose:
+     - "8080"
+    ports:
+     - "8080:8080"
+
+  api_1:
+    restart: always
+    build: ./api
+    command: gunicorn -w 4 --bind :5000 wsgi:application # to bypass wsgi use api:app
+    volumes:
+     - ./api:/api
+    # expose:
+    #  - "5000"
+    ports:
+     - "5000:5000"
+    links:
+     - redis
+  api_2:
+    restart: always
+    build: ./api
+    command: gunicorn -w 4 --bind :5001 wsgi:application
+    volumes:
+     - ./api:/api
+    # expose:
+    #  - "5001"
+    ports:
+     - "5001:5000"
+    links:
+     - redis
+  api_3:
+    restart: always
+    build: ./api
+    command: gunicorn -w 4 --bind :5002 wsgi:application
+    volumes:
+     - ./api:/api
+    # expose:
+    #  - "5000"
+    ports:
+     - "5002:5000"
+    links:
+     - redis
+  api_4:
+    restart: always
+    build: ./api
+    command: gunicorn -w 4 --bind :5003 wsgi:application
+    volumes:
+     - ./api:/api
+    # expose:
+    #  - "5000"
+    ports:
+     - "5003:5000"
+    links:
+     - redis
+
+#   mongo:
+#     restart: always
+#     build: ./mongo
+# #      volumes:
+# #        Mongo uses fsync() which cannot map
+#     ports:
+#       - "27017:27017"
